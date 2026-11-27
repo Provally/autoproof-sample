@@ -35,10 +35,12 @@ def search_invoices():
     return {"invoices": [dict(row) for row in rows]}
 
 
-def preview_note():
-    get_current_user()
-    note = request.form.get("note", "")
-    return render_template_string("<h1>Invoice note</h1><p>" + note + "</p>")
+def preview_reminder():
+    """Show how a payment reminder the user wrote renders, with a sample invoice in place of a real one."""
+    user = get_current_user()
+    template = request.form.get("template", "")
+    invoice = {"number": "INV-0000", "customer": "Sample customer", "total": "0.00", "contact": user["email"]}
+    return render_template_string(template, invoice=invoice)
 
 
-invoices.add_url_rule("/invoices/note-preview", view_func=preview_note, methods=["POST"])
+invoices.add_url_rule("/invoices/reminder-preview", view_func=preview_reminder, methods=["POST"])
