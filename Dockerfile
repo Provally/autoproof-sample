@@ -5,7 +5,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
-RUN useradd --create-home ledgerly && mkdir -p /srv/ledgerly/data && chown -R ledgerly /srv/ledgerly
+# Attachments are published with the image and read only: the service account owns the database, not them.
+COPY attachments ./data/attachments
+RUN useradd --create-home ledgerly && chown ledgerly /srv/ledgerly/data
 USER ledgerly
 
 ENV LEDGERLY_DATA=/srv/ledgerly/data

@@ -22,7 +22,7 @@ def preview():
     name = request.args.get("name", "")
     root = os.path.realpath(ATTACHMENTS_DIR)
     path = os.path.realpath(os.path.join(root, name))
-    if os.path.commonpath([root, path]) != root:
+    if os.path.commonpath([root, path]) != root or not os.path.isfile(path):
         abort(404)
     with open(path, "rb") as handle:
         return handle.read(4096)
