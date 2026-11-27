@@ -15,4 +15,5 @@ docker build -t ledgerly .
 docker run -p 8000:8000 ledgerly
 ```
 
-`POST /signup` with a form field `email` opens an account and signs it in with a session cookie.
+`POST /signup` with a form field `email` opens an account and signs it in with a session cookie. An address that
+already has an account is refused with 409; the sample invoices belong to two such accounts.

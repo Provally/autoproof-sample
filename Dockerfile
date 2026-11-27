@@ -5,9 +5,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
-# Attachments are published with the image and read only: the service account owns the database, not them.
-COPY attachments ./data/attachments
-RUN useradd --create-home ledgerly && chown ledgerly /srv/ledgerly/data
+COPY attachments ./attachments
+# The service account owns only the database directory. The code and the attachments stay root-owned and read only.
+RUN useradd --create-home ledgerly && mkdir data && chown ledgerly data
 USER ledgerly
 
 ENV LEDGERLY_DATA=/srv/ledgerly/data

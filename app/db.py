@@ -5,7 +5,8 @@ from flask import g
 
 DATA_DIR = os.environ.get("LEDGERLY_DATA", "data")
 DB_PATH = os.path.join(DATA_DIR, "ledgerly.db")
-ATTACHMENTS_DIR = os.path.join(DATA_DIR, "attachments")
+# Attachments ship with the code, outside the data directory the service writes.
+ATTACHMENTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "attachments")
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (
@@ -21,6 +22,8 @@ CREATE TABLE IF NOT EXISTS invoices (
     created_at TEXT NOT NULL
 );
 """
+
+SAMPLE_USERS = [("billing@acme.example",), ("finance@globex.example",)]
 
 SAMPLE_INVOICES = [
     ("billing@acme.example", "INV-1001", "Acme Corp", 120000, "2026-10-01"),
@@ -48,11 +51,12 @@ def close_db(_error=None):
 
 
 def init_app(app):
-    os.makedirs(ATTACHMENTS_DIR, exist_ok=True)
+    os.makedirs(DATA_DIR, exist_ok=True)
     conn = connect()
     try:
         conn.executescript(SCHEMA)
         if not conn.execute("SELECT id FROM invoices LIMIT 1").fetchall():
+            conn.executemany("INSERT INTO users (email) VALUES (?)", SAMPLE_USERS)
             conn.executemany(
                 "INSERT INTO invoices (owner, number, customer, total_cents, created_at) VALUES (?, ?, ?, ?, ?)",
                 SAMPLE_INVOICES,
